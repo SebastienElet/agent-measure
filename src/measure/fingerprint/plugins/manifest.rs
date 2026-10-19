@@ -1,4 +1,5 @@
 use crate::measure::MeasureError;
+use digest_io::IoWrapper;
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
@@ -35,10 +36,13 @@ pub fn read(path: &Path) -> Result<Manifest, MeasureError> {
 }
 
 fn window_marker(file: &mut File, size: u64) -> Result<String, MeasureError> {
-    let mut hasher = Sha256::new();
-    hasher.update(size.to_le_bytes());
+    let mut hasher = IoWrapper(Sha256::new());
+    hasher.0.update(size.to_le_bytes());
     std::io::copy(&mut file.take(u64::from(WINDOW_BYTES)), &mut hasher)?;
     file.seek(SeekFrom::End(-(i64::from(WINDOW_BYTES))))?;
     std::io::copy(&mut file.take(u64::from(WINDOW_BYTES)), &mut hasher)?;
-    Ok(format!("oversized:{size}:{:x}", hasher.finalize()))
+    Ok(format!(
+        "oversized:{size}:{}",
+        hex::encode(hasher.0.finalize())
+    ))
 }

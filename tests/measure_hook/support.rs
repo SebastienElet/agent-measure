@@ -179,7 +179,7 @@ fn run_id(agent: &str, session: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(agent.as_bytes());
     hasher.update(session.as_bytes());
-    format!("{:x}", hasher.finalize())
+    hex::encode(hasher.finalize())
 }
 pub fn read_json(
     path: impl AsRef<Path>,

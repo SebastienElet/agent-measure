@@ -94,7 +94,7 @@ fn digest(parts: &[&[u8]]) -> String {
     for part in parts {
         hasher.update(part);
     }
-    format!("{:x}", hasher.finalize())
+    hex::encode(hasher.finalize())
 }
 
 pub(super) fn now_ms() -> u64 {

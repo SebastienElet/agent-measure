@@ -89,5 +89,5 @@ fn visit_events(
 }
 
 fn identity_hash(pr: &PrIdentity) -> Result<String, MeasureError> {
-    Ok(format!("{:x}", Sha256::digest(serde_json::to_vec(pr)?)))
+    Ok(hex::encode(Sha256::digest(serde_json::to_vec(pr)?)))
 }

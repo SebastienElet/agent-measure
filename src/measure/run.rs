@@ -30,10 +30,8 @@ pub fn build(input: NewRun<'_>) -> Result<RunRecord, MeasureError> {
         run_id: input.run_id,
         agent: input.agent.as_str().to_owned(),
         started_at_ms: input.timestamp_ms,
-        model_fingerprint: model(input.raw).map(|model| {
-            let digest = Sha256::digest(model.as_bytes());
-            format!("{digest:x}")
-        }),
+        model_fingerprint: model(input.raw)
+            .map(|model| hex::encode(Sha256::digest(model.as_bytes()))),
         repository_commit: repository.as_ref().and_then(|value| value.head.clone()),
         repository_dirty: repository.map(|value| value.dirty),
         harness_fingerprint: fingerprint.digest,
