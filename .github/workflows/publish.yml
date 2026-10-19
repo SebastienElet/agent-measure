@@ -33,7 +33,7 @@ jobs:
       - run: bun test tests/launcher.test.mjs
       - run: bun pm pack --destination ../../dist
         working-directory: packages/${{ matrix.variant }}
-      - run: npm publish dist/sebastienelet-agent-measure-${{ matrix.variant }}-1.0.0.tgz --provenance --access public
+      - run: npm publish ./dist/sebastienelet-agent-measure-${{ matrix.variant }}-0.0.1.tgz --provenance --access public
   entry:
     needs: native
     runs-on: ubuntu-24.04
@@ -52,4 +52,4 @@ jobs:
         with:
           node-version: 24.21.0
       - run: bun pm pack --destination dist
-      - run: npm publish dist/sebastienelet-agent-measure-1.0.0.tgz --provenance --access public
+      - run: npm publish ./dist/sebastienelet-agent-measure-0.0.1.tgz --provenance --access public

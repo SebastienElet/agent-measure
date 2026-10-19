@@ -1,8 +1,8 @@
 [package]
 name = "agent-measure"
-version = "1.0.0"
+version = "0.0.1"
 edition = "2024"
-description = "Inspection and deployment of coding-agent configuration."
+description = "Local privacy-bounded agent measurement"
 license-file = "LICENSE"
 repository = "https://github.com/SebastienElet/agent-measure"
 readme = "README.md"
