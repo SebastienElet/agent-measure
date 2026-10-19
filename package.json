@@ -1,6 +1,6 @@
 {
   "name": "@sebastienelet/agent-measure",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Local privacy-bounded agent measurement",
   "type": "module",
   "license": "BSD-3-Clause",
@@ -33,8 +33,8 @@
     "packages/*"
   ],
   "optionalDependencies": {
-    "@sebastienelet/agent-measure-darwin-arm64": "1.0.0",
-    "@sebastienelet/agent-measure-linux-x64-gnu": "1.0.0"
+    "@sebastienelet/agent-measure-darwin-arm64": "0.0.1",
+    "@sebastienelet/agent-measure-linux-x64-gnu": "0.0.1"
   },
   "scripts": {
     "build": "bun scripts/build.mjs",

@@ -1,7 +1,7 @@
 # agent-measure
 
 Local agent measurement, extracted from Arnes. Prepared for
-`@sebastienelet/agent-measure@1.0.0`; no registry release is qualified yet.
+`@sebastienelet/agent-measure@0.0.1`; no registry release is qualified yet.
 
 Use Bun 1.4.3 to acquire the exact published version once available. Intended native
 targets: macOS ARM64 and Linux x64 glibc. Installation acquires files only.
