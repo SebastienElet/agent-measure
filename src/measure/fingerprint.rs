@@ -2,6 +2,7 @@ mod plugins;
 mod traversal;
 use super::MeasureError;
 use super::model::HookAgent;
+use digest_io::IoWrapper;
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 use traversal::Traversal;
@@ -16,7 +17,7 @@ pub fn deployed(
     home: &Path,
     repository: &Path,
 ) -> Result<Fingerprint, MeasureError> {
-    let mut hasher = Sha256::new();
+    let mut hasher = IoWrapper(Sha256::new());
     let mut selected = selected_roots(agent, home, repository);
     let plugins = plugins::selected(agent, home, repository)?;
     let mut limitations = plugins.limitations;
@@ -27,7 +28,7 @@ pub fn deployed(
         traversal.hash_selected(&root)?;
     }
     Ok(Fingerprint {
-        digest: format!("{:x}", hasher.finalize()),
+        digest: hex::encode(hasher.0.finalize()),
         limitations,
     })
 }

@@ -85,7 +85,7 @@ fn read_stdin() -> Result<RawPayload, MeasureError> {
     Ok(RawPayload {
         bytes,
         size,
-        sha256: format!("{:x}", hasher.finalize()),
+        sha256: hex::encode(hasher.finalize()),
         oversized: size > MAX_PAYLOAD_BYTES,
     })
 }

@@ -1,5 +1,6 @@
 use super::SelectedRoot;
 use crate::measure::MeasureError;
+use digest_io::IoWrapper;
 use sha2::{Digest, Sha256};
 use std::collections::{BinaryHeap, HashSet};
 use std::ffi::OsString;
@@ -13,14 +14,14 @@ const MAX_FILE_BYTES: u64 = 1_048_576;
 const WINDOW_BYTES: u32 = 65_536;
 
 pub struct Traversal<'a> {
-    hasher: &'a mut Sha256,
+    hasher: &'a mut IoWrapper<Sha256>,
     limitations: &'a mut Vec<String>,
     seen: HashSet<PathBuf>,
     remaining: usize,
 }
 
 impl<'a> Traversal<'a> {
-    pub fn new(hasher: &'a mut Sha256, limitations: &'a mut Vec<String>) -> Self {
+    pub fn new(hasher: &'a mut IoWrapper<Sha256>, limitations: &'a mut Vec<String>) -> Self {
         Self {
             hasher,
             limitations,
@@ -58,20 +59,20 @@ impl<'a> Traversal<'a> {
     ) -> std::io::Result<()> {
         write!(self.hasher, "{}\0", label.display())?;
         if !path.exists() {
-            self.hasher.update(b"missing\0");
+            self.hasher.0.update(b"missing\0");
             return Ok(());
         }
         if !self.consume(&label.display().to_string())? {
-            self.hasher.update(b"omitted\0");
+            self.hasher.0.update(b"omitted\0");
             return Ok(());
         }
         let canonical = fs::canonicalize(path)?;
         if boundary.is_some_and(|boundary| !canonical.starts_with(boundary)) {
-            self.hasher.update(b"escape\0");
+            self.hasher.0.update(b"escape\0");
             return Ok(());
         }
         if !self.seen.insert(canonical) {
-            self.hasher.update(b"cycle\0");
+            self.hasher.0.update(b"cycle\0");
             return Ok(());
         }
         let metadata = fs::metadata(path)?;
@@ -80,7 +81,7 @@ impl<'a> Traversal<'a> {
         } else if metadata.is_file() {
             self.hash_file(path, metadata.len())
         } else {
-            self.hasher.update(b"unsupported\0");
+            self.hasher.0.update(b"unsupported\0");
             Ok(())
         }
     }
@@ -91,11 +92,11 @@ impl<'a> Traversal<'a> {
         label: &Path,
         boundary: Option<&Path>,
     ) -> std::io::Result<()> {
-        self.hasher.update(b"directory\0");
+        self.hasher.0.update(b"directory\0");
         let inventory = bounded_entries(path, self.remaining)?;
         if inventory.total > inventory.selected.len() {
             write!(self.hasher, "truncated\0{}\0", inventory.total)?;
-            self.hasher.update(inventory.aggregate);
+            self.hasher.0.update(inventory.aggregate);
             self.limit("fingerprint inventory is lexicographically bounded to 512 entries");
         }
         for (name, path) in inventory.selected {

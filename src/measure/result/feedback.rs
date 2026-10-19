@@ -140,7 +140,7 @@ fn feedback_id(args: &FeedbackArgs, timestamp: u64) -> String {
         hasher.update((value.len() as u64).to_be_bytes());
         hasher.update(value);
     }
-    format!("{:x}", hasher.finalize())
+    hex::encode(hasher.finalize())
 }
 
 #[cfg(test)]
