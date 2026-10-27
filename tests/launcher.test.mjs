@@ -14,15 +14,19 @@ test("Bun wrapper preserves native argument failures", () => {
 });
 
 test("missing optional native package is an explicit failure without fallback", async () => {
-  const { mkdtemp, copyFile, rm } = await import("node:fs/promises");
+  const { mkdtemp, mkdir, copyFile, rm } = await import("node:fs/promises");
   const { tmpdir } = await import("node:os");
   const directory = await mkdtemp(join(tmpdir(), "launcher-552-"));
   try {
-    const isolated = join(directory, "launcher.mjs");
+    const isolatedVersion = "0.0.0-test";
+    await Bun.write(join(directory, "package.json"), JSON.stringify({ version: isolatedVersion }));
+    await mkdir(join(directory, "bin"));
+    const isolated = join(directory, "bin/agent-measure.mjs");
     await copyFile(launcher, isolated);
     const result = Bun.spawnSync([process.execPath, isolated, "--version"]);
     expect(result.exitCode).toBe(1);
     expect(result.stderr.toString()).toContain("Missing @sebastienelet/");
+    expect(result.stderr.toString()).toContain(`@${isolatedVersion}; install optional dependencies with Bun`);
     expect(result.stdout.toString()).toBe("");
   } finally {
     await rm(directory, { recursive: true });
